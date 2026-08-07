@@ -1,0 +1,13 @@
+{
+  "executable": "C:/Program Files/Git/bin/bash.exe",
+  "args": [
+    "--noprofile",
+    "--norc",
+    "-lc"
+  ],
+  "appendCommandArgument": true,
+  "cwd": null,
+  "env": {},
+  "timeoutMs": 120000,
+  "missingExecutable": "error"
+}
