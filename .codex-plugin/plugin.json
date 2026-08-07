@@ -8,11 +8,11 @@
   "interface": {
     "displayName": "Codex Shell Hook",
     "shortDescription": "Rewrite Bash commands to a configured shell.",
-    "longDescription": "Uses Codex PreToolUse hooks to route Bash tool commands through Git Bash or Nushell without changing the tool surface.",
+    "longDescription": "Uses Codex PreToolUse hooks to route Bash tool commands without changing the tool surface.",
     "developerName": "codex-chsh-plugin",
     "category": "Developer Tools",
     "defaultPrompt": [
-      "Route Bash commands through Git Bash."
+      "Reroute Tool_call.Bash. Current configured shell: see config/shell.json"
     ],
     "capabilities": [
       "Interactive",

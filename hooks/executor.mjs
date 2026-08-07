@@ -44,20 +44,19 @@ function validateConfig(value) {
 async function loadConfig() {
   const path = process.env.CHSH_CONFIG || defaultConfigPath;
   const raw = await readFile(path, 'utf8');
-  return validateConfig(JSON.parse(raw.replace(/^\\uFEFF/, '')));
+  return validateConfig(JSON.parse(raw.replace(/^\uFEFF/, '')));
 }
 
-function formatExecutionCommand(encodedCommand, outerShell) {
+function formatExecutionCommand(command, outerShell) {
   const executable = outerShell === 'bash' ? 'node' : process.execPath;
   const script = pathForOuterShell(scriptPath, outerShell);
-  const values = [executable, script, '--execute', encodedCommand];
+  const values = [executable, script, '--execute', command];
   if (outerShell === 'powershell') return '& ' + values.map(quotePowerShell).join(' ');
   if (outerShell === 'bash') return values.map(quoteBash).join(' ');
   throw new Error('Unsupported outer shell: ' + outerShell);
 }
 
-async function executeCommand(encodedCommand) {
-  const command = Buffer.from(encodedCommand, 'base64').toString('utf8');
+async function executeCommand(command) {
   const config = await loadConfig();
   const child = spawn(config.executable, [...config.args, command], {
     cwd: config.cwd ?? process.cwd(),
@@ -109,7 +108,7 @@ if (process.argv[2] === '--execute') {
     process.exit(0);
   }
 
-  if (event.tool_input.command.includes('rewrite-bash.mjs') && event.tool_input.command.includes('--execute')) {
+  if (event.tool_input.command.includes('executor.mjs') && event.tool_input.command.includes('--execute')) {
     stdout.write('{}');
     process.exit(0);
   }
@@ -118,8 +117,7 @@ if (process.argv[2] === '--execute') {
     const config = await loadConfig();
     void config;
     const outerShell = process.env.CHSH_OUTER_SHELL || (process.platform === 'win32' ? 'powershell' : 'bash');
-    const encodedCommand = Buffer.from(event.tool_input.command, 'utf8').toString('base64');
-    const updatedInput = { ...event.tool_input, command: formatExecutionCommand(encodedCommand, outerShell) };
+    const updatedInput = { ...event.tool_input, command: formatExecutionCommand(event.tool_input.command, outerShell) };
     stdout.write(JSON.stringify({
       hookSpecificOutput: {
         hookEventName: 'PreToolUse',
