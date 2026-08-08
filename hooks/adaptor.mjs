@@ -1,9 +1,7 @@
 import { readFile } from 'node:fs/promises';
-import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { stdin, stdout } from 'node:process';
 
-const scriptPath = fileURLToPath(import.meta.url);
 const defaultConfigPath = fileURLToPath(new URL('../config/shell.json', import.meta.url));
 
 function deny(reason) {
@@ -43,9 +41,6 @@ function validateConfig(value) {
   if (typeof value.executable !== 'string' || value.executable.length === 0) throw new Error('Shell executable must be a non-empty string');
   if (!Array.isArray(value.args) || value.args.some((argument) => typeof argument !== 'string')) throw new Error('Shell args must be an array of strings');
   if (value.appendCommandArgument !== true) throw new Error('appendCommandArgument must be true');
-  if (value.cwd !== null && typeof value.cwd !== 'string') throw new Error('cwd must be a string or null');
-  if (!value.env || typeof value.env !== 'object' || Array.isArray(value.env)) throw new Error('env must be an object');
-  if (!Number.isInteger(value.timeoutMs) || value.timeoutMs <= 0) throw new Error('timeoutMs must be a positive integer');
   if (value.missingExecutable !== 'error') throw new Error('missingExecutable must be "error"');
   return value;
 }
@@ -57,8 +52,8 @@ async function loadConfig() {
 }
 
 function formatExecutionCommand(config, command, outerShell) {
-  const shell = config.executable;
-  const args = config.args
+  const shell = pathForOuterShell(config.executable, outerShell);
+  const args = config.args;
   if (outerShell === 'powershell') return '& ' + quotePowerShell(shell) + ' ' + [...args, command].map(quotePowerShellNativeArg).join(' ');
   if (outerShell === 'bash') return [shell, ...args, command].map(quoteBash).join(' ');
   throw new Error('Unsupported outer shell: ' + outerShell);
@@ -86,20 +81,19 @@ if (!event.tool_input || typeof event.tool_input !== 'object' || typeof event.to
 
 if (event.permissionDecision === 'deny') {
   stdout.write(JSON.stringify({
-      hookSpecificOutput: {
+    hookSpecificOutput: {
       hookEventName: 'PreToolUse',
       permissionDecision: 'deny',
       permissionDecisionReason: event.permissionDecisionReason || 'No reason provided.',
     },
-  })
-  )
+  }));
+  process.exit(0);
 }
 
 try {
   const config = await loadConfig();
   const outerShell = process.env.CHSH_OUTER_SHELL || (process.platform === 'win32' ? 'powershell' : 'bash');
   const updatedInput = { ...event.tool_input, command: formatExecutionCommand(config, event.tool_input.command, outerShell) };
-  void config;
   stdout.write(JSON.stringify({
     hookSpecificOutput: {
       hookEventName: 'PreToolUse',

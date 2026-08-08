@@ -4,8 +4,5 @@
     "-lc"
   ],
   "appendCommandArgument": true,
-  "cwd": null,
-  "env": {},
-  "timeoutMs": 120000,
   "missingExecutable": "error"
 }

@@ -10,12 +10,10 @@ function validateConfig(value) {
     if (typeof value.executable !== 'string' || value.executable.length === 0) throw new Error('Shell executable must be a non-empty string');
     if (!Array.isArray(value.args) || value.args.some((argument) => typeof argument !== 'string')) throw new Error('Shell args must be an array of strings');
     if (value.appendCommandArgument !== true) throw new Error('appendCommandArgument must be true');
-    if (value.cwd !== null && typeof value.cwd !== 'string') throw new Error('cwd must be a string or null');
-    if (!value.env || typeof value.env !== 'object' || Array.isArray(value.env)) throw new Error('env must be an object');
-    if (!Number.isInteger(value.timeoutMs) || value.timeoutMs <= 0) throw new Error('timeoutMs must be a positive integer');
     if (value.missingExecutable !== 'error') throw new Error('missingExecutable must be "error"');
     return value;
-}
+    }
+      
 
 async function loadConfig() {
     const path = process.env.CHSH_CONFIG || defaultConfigPath;
@@ -45,7 +43,7 @@ try {
         Never use Get-Content, Copy-Item, Get-ChildItem, Test-Path,
         Join-Path, PowerShell variables, or PowerShell syntax.
         Windows paths must be converted to /c/... or quoted safely.
-        You should treat this as the name of executable \"${config.executable}\".
+        You should treat this shell as the executable \"${config.executable}\".
         `;
 
     process.stdout.write(JSON.stringify({
