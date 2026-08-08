@@ -39,7 +39,14 @@ try {
     const event = input.hook_event_name ?? 'SessionStart';
 
     const message =
-        `Important: the Bash tool now runs through: ${config.executable}`;
+        `
+        Important: [tool_call] Bash now runs through ${config.executable}
+        Use cat, cp, mv, rm, ls, pwd, test, and shell pipelines.
+        Never use Get-Content, Copy-Item, Get-ChildItem, Test-Path,
+        Join-Path, PowerShell variables, or PowerShell syntax.
+        Windows paths must be converted to /c/... or quoted safely.
+        You should treat this as the name of executable \"${config.executable}\".
+        `;
 
     process.stdout.write(JSON.stringify({
         hookSpecificOutput: {

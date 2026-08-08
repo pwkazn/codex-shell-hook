@@ -1,8 +1,6 @@
 {
-  "executable": "C:/Program Files/Git/bin/bash.exe",
+  "executable": "C:\\Program Files\\Git\\bin\\bash",
   "args": [
-    "--noprofile",
-    "--norc",
     "-lc"
   ],
   "appendCommandArgument": true,
