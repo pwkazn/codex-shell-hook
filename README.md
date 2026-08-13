@@ -1,15 +1,15 @@
 # Codex Shell Hook
 
+[![State-of-the-art Shitcode](https://img.shields.io/static/v1?label=State-of-the-art&message=Shitcode&color=7B5804)](https://github.com/trekhleb/state-of-the-art-shitcode)
+
 `Codex Shell Hook` is a Codex plugin that routes `Bash` tool calls (shell command execution tool calls) through a configured shell. It changes the command submitted to the existing Bash tool without adding a separate executor layer or virtual machine, requires only Node.js support.
 
-The disadvantage is that `PreToolUse` hooks would actually break Codex approving sequences and approve any command if they were rewritten. 
-
-Therefore, this plugin currently does not support command approval check. **It is not recommended to use this plugin if you have any safety concern.**
+The readablity of the commands will be terrible.
 
 The default config is Git Bash on Windows (you don't really need this in macOS/Linux do you?):
 
-```text
-C:\Program Files\Git\bin\bash -lc <command>
+```powershell
+& 'C:\Program Files\Git\bin\bash' -lc <command>
 ```
 
 ## How it works
@@ -38,6 +38,7 @@ The default configuration is [`config/shell.json`](config/shell.json):
 
 ```json
 {
+  "name": "Git Bash",
   "executable": "C:\\Program Files\\Git\\bin\\bash",
   "args": ["-lc"],
   "appendCommandArgument": true,
@@ -47,6 +48,7 @@ The default configuration is [`config/shell.json`](config/shell.json):
 
 Configuration rules:
 
+- `name` must be a non-empty string.
 - `executable` must be a non-empty string.
 - `args` must be an array of strings. The original Bash command is appended
   after these arguments.
@@ -58,20 +60,25 @@ command. The remaining fields are validated for configuration compatibility;
 they are not independently applied because execution remains in the Bash
 tool.
 
+The reminder will construct a notification for your agent to use the new shell using `name` and `executable` params.
 
 ## Installation
 
-Install or enable this directory as a Codex plugin using your Codex plugin
-workflow. The plugin manifest is at
-[`.codex-plugin/plugin.json`](.codex-plugin/plugin.json), and the hook
-registration is at [`hooks/hooks.json`](hooks/hooks.json).
+A: Just tell Codex to install.
+
+B: 
+1. Run following commands at repo's directory to add a local marketplace.
+
+```shell
+codex plugin marketplace add https://github.com/pwkazn/codex-shell-hook
+```
+
+2. Install this plugin from Codex CLI or APP.
 
 After installation:
 
 1. Confirm that `config/shell.json` points to the shell you want to use.
 2. Ensure `node` and the configured executable are available to Codex.
-3. Start a new Codex session. The session-start reminder should display the
-   configured executable.
 
 ## Repository layout
 

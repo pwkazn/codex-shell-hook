@@ -1,4 +1,5 @@
 {
+  "name": "Git Bash",
   "executable": "C:\\Program Files\\Git\\bin\\bash",
   "args": [
     "-lc"

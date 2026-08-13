@@ -1,9 +1,9 @@
 {
-  "name": "hook",
+  "name": "codex-shell-hook",
   "version": "0.1.0",
   "description": "Rewrite Bash commands to run through a configured shell.",
   "author": {
-    "name": "codex-chsh-plugin"
+    "name": "pwkazn"
   },
   "interface": {
     "displayName": "Codex Shell Hook",
